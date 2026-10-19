@@ -1,63 +1,84 @@
-# 🎵 Signal
-
-> Lightweight, zero-setup audio architecture and sound manager for Unity 6+.  
-> An open-source production toolkit by **[Resenha Studios](https://github.com/Resenha-Studios)**.
-
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/Resenha-Studios/signal)
-[![Unity](https://img.shields.io/badge/unity-6000.0%2B-black.svg)](https://unity.com)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE.md)
-[![UI Toolkit](https://img.shields.io/badge/UI%20Toolkit-Standard-purple.svg)](https://docs.unity3d.com/Manual/UIElements.html)
-[![Localization](https://img.shields.io/badge/Languages-EN%20%7C%20PT%20%7C%20ES%20%7C%20JA%20%7C%20ZH-orange.svg)](#localization)
-
-Built on a modern **UI Toolkit Dashboard**, automated **lazy loading**, smart **object pooling**, **3D spatial audio**, **surface footstep raycasting**, and **type-safe audio keys**.
-
----
-
-## ✨ Features
-
-| Feature | Description |
-|---|---|
-| **Zero-Setup Runtime** | Never drag manager prefabs into scenes. Signal auto-spawns dynamically on first audio call. |
-| **Tools > Resenha > Signal** | Unified Resenha Studio tooling menu with keyboard shortcut (`Ctrl/Cmd + Shift + S`). |
-| **Clean UI Toolkit Dashboard** | AAA minimal dark interface with pagination, instant search, and real-time audio previews. |
-| **5-Language Localization** | Full editor interface localized in English, Portuguese, Spanish, Japanese, and Chinese. |
-| **Surface Footstep Engine** | Detects Physics Materials and Terrain textures dynamically via Raycast for character footsteps. |
-| **Ambient Triggers (3D & 2D)** | Crossfading ambient zones with customizable fade in/out curves and exit behaviors. |
-| **3D Spatial Audio** | Fine-grained Doppler level, speaker spread angle, and min/max rolloff distances per entry. |
-| **Smart Audio Ducking** | Automatically dip background music when dialog or priority sound effects trigger. |
-| **Smart Audio Pooling** | Zero-allocation object pooling for high-intensity SFX and UI sounds. |
-| **AudioKeys Code Generator** | Generates strongly-typed C# constants (`AudioKeys.SFX.jump`) for IDE autocomplete and zero typos. |
-| **Backward Compatible** | Seamless migration path from legacy `SignalAudioManagerUnity` with zero breaking changes. |
+<p align="center">
+  <h1 align="center">🎵 Signal</h1>
+  <p align="center">
+    <strong>Zero-Setup Audio Architecture & Sound Manager for Unity 6+</strong>
+  </p>
+  <p align="center">
+    <a href="https://github.com/Resenha-Studios/signal/blob/main/LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT"></a>
+    <img src="https://img.shields.io/badge/Unity-6000.0%2B-black.svg?logo=unity" alt="Unity Version"></a>
+    <img src="https://img.shields.io/badge/UI-UI%20Toolkit-informational.svg" alt="UI Toolkit"></a>
+    <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen.svg" alt="PRs Welcome"></a>
+    <img src="https://img.shields.io/badge/Localization-5%20Languages-orange.svg" alt="Localization"></a>
+  </p>
+</p>
 
 ---
 
-## 📦 Installation
+## ⚡ Overview
 
-### Option A: Unity Package Manager via Git URL (Recommended)
+**Signal** is an open-source, modular, zero-setup audio engine and management architecture built for Unity 6+.
 
-1. In Unity, open `Window > Package Manager`.
-2. Click `+` and choose **Add package from git URL...**
-3. Enter the repository URL:
-```
-https://github.com/chspDEV/signal-audio-manager-unity.git
-```
+Designed for production workflows, **Signal** eliminates scene pollution: you never need to manually drag manager prefabs or audio sources into your hierarchy. On the very first audio request, Signal automatically initializes its background pools and mixer channels dynamically via decoupled event channels.
 
-### Option B: OpenUPM / Manifest
+Access the management dashboard anytime via **`Tools > Resenha > Signal`** (Shortcut: `Ctrl + Shift + S` / `Cmd + Shift + S`).
 
-Add the dependency to your `Packages/manifest.json`:
+---
+
+## 📦 Key Features
+
+- **Zero-Setup Architecture**:
+  - Automatically loads and instantiates the audio host on-demand from Resources.
+  - Scene-independent: persist seamlessly across scene loads with `DontDestroyOnLoad`.
+- **Clean UI Toolkit Dashboard**:
+  - Built 100% with Unity UI Toolkit (UXML + USS) adhering to AAA minimal design principles.
+  - Instant library search, pagination, bulk imports, and real-time audio playback previews.
+- **Multilingual Editor Support**:
+  - Full native localization in 5 languages: **English**, **Português**, **Español**, **日本語**, and **简体中文**.
+- **High-Performance Object Pooling**:
+  - Zero-allocation audio pools for high-frequency SFX and UI feedback to prevent GC spikes.
+- **Surface-Aware Footstep Engine**:
+  - Raycast-driven footstep system dynamically detecting Physics Materials and Terrain Texture Layers.
+- **Ambient Trigger Zones (3D & 2D)**:
+  - Trigger volume areas with customizable crossfade curves and distance falloff.
+- **3D Spatial Audio & Smart Ducking**:
+  - Fine-grained control over Doppler levels, speaker spread, and 3D rolloff curves.
+  - Automatic music ducking when priority voice lines or important sound cues trigger.
+- **Strongly-Typed Code Generator (`AudioKeys`)**:
+  - Automatically generates C# constant key classes (`AudioKeys.SFX.*`, `AudioKeys.Music.*`) to eliminate runtime typos.
+- **100% Backward Compatibility**:
+  - Full compatibility proxy layer and Unity `[MovedFrom]` serialization attributes to seamlessly upgrade existing projects from `SignalAudioManagerUnity` v1.x with zero data loss.
+
+---
+
+## 🚀 Installation
+
+### Via Unity Package Manager (Git URL)
+
+1. Open your Unity project.
+2. Go to **Window > Package Manager**.
+3. Click the **`+`** button in the top-left corner and choose **Add package from git URL...**.
+4. Enter the repository URL:
+   ```text
+   https://github.com/Resenha-Studios/signal.git
+   ```
+5. Click **Add**.
+
+Alternatively, add the dependency directly to your `Packages/manifest.json`:
+
 ```json
 {
   "dependencies": {
-    "com.resenha.signal": "https://github.com/chspDEV/signal-audio-manager-unity.git"
+    "com.resenha.signal": "https://github.com/Resenha-Studios/signal.git"
   }
 }
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ Quick Start
 
-### 1. Initial Setup
+### 1. Initialize Signal Assets
+
 1. Open the dashboard via **`Tools > Resenha > Signal`**.
 2. Click **Initialize Signal** to automatically generate your Audio Mixers, SFX Prefabs, and Configuration assets in your desired folder.
 
@@ -67,72 +88,97 @@ Add the dependency to your `Packages/manifest.json`:
 using Resenha.Signal;
 using UnityEngine;
 
-public class PlayerAudio : MonoBehaviour
+public class AudioExample : MonoBehaviour
 {
     private void Start()
     {
-        // 1. Play background music with 2.0s crossfade
-        Signal.PlayMusic("exploration_theme", 2.0f);
+        // Play music with smooth crossfading
+        Signal.PlayMusic("exploration_theme", fadeDuration: 2.0f);
     }
 
-    public void OnJump()
+    public void OnPlayerJump()
     {
-        // 2. Play 2D sound effect
+        // Play a 2D sound effect
         Signal.PlaySFX("jump");
 
         // Or using generated type-safe keys:
         // Signal.PlaySFX(AudioKeys.SFX.jump);
     }
 
-    public void OnExplosion(Vector3 worldPos)
+    public void OnExplosion(Vector3 worldPosition)
     {
-        // 3. Play 3D sound effect at position with ducking
-        Signal.PlaySFX("explosion", worldPos, triggerDucking: true, duckingDuration: 1.5f);
+        // Play 3D spatial sound effect at position with smart ducking
+        Signal.PlaySFX("explosion", worldPosition, triggerDucking: true, duckingDuration: 1.5f);
     }
 
-    public void OnButtonClick()
+    public void OnButtonHover()
     {
-        // 4. Play UI sound (never paused by Time.timeScale)
-        Signal.PlayUI("btn_click");
+        // Play UI sound effect (ignores Time.timeScale)
+        Signal.PlayUI("button_hover");
+    }
+
+    public void OnDelayedAction()
+    {
+        // Play sound after a delay (e.g. syncing with an animation)
+        Signal.PlaySFXDelayed("spell_cast", delayInSeconds: 0.75f);
     }
 }
 ```
 
-### 3. Volume Sliders in Settings Menus
+### 3. Settings Menu Integration (Mixer Control)
+
+Easily link your volume sliders to the Master Audio Mixer with normalized values (`0.0f` to `1.0f`):
 
 ```csharp
-// Simple normalized values (0.0f to 1.0f)
-Signal.SetMasterVolume(1.0f);
-Signal.SetMusicVolume(0.8f);
-Signal.SetSFXVolume(0.9f);
-Signal.SetUIVolume(1.0f);
+using Resenha.Signal;
+
+public class SettingsMenu
+{
+    public void OnMasterVolumeChanged(float value) => Signal.SetMasterVolume(value);
+    public void OnMusicVolumeChanged(float value) => Signal.SetMusicVolume(value);
+    public void OnSFXVolumeChanged(float value) => Signal.SetSFXVolume(value);
+    public void OnUIVolumeChanged(float value) => Signal.SetUIVolume(value);
+}
 ```
 
 ---
 
-## 🔄 Migrating from v1.x (Signal Audio Manager)
+## 🔄 Migrating from v1.x (Backward Compatibility)
 
-Signal v2.0 introduces clean namespaces under `Resenha.Signal.*`. To ensure existing projects do not break:
+Signal v2.0 introduces clean namespaces under `Resenha.Signal.*`. To ensure existing projects using v1.x do not break:
 
-1. **API Calls**: Calling `Signal.PlaySFX(...)` or `Signal.PlayMusic(...)` works out of the box.
-2. **Old Namespaces**: `using SignalAudioManagerUnity.Communication;`, `SignalAudioManagerUnity.Core;`, `SignalAudioManagerUnity.Data;`, and `SignalAudioManagerUnity.Components;` are fully supported via backward-compatible proxy types with `[Obsolete]` guides.
-3. **Scenes & Prefabs**: All component types (`SoundManager`, `PlaySFX`, `FootstepController`, etc.) utilize Unity's `[MovedFrom]` serialization mapping, preserving all scene and prefab references without data loss.
+1. **API Calls**: Static calls to `Signal.PlaySFX(...)` or `Signal.PlayMusic(...)` remain fully compatible.
+2. **Old Namespaces**: `using SignalAudioManagerUnity.Communication;`, `SignalAudioManagerUnity.Core;`, `SignalAudioManagerUnity.Data;`, and `SignalAudioManagerUnity.Components;` are supported via backward-compatible proxy classes with `[Obsolete]` guides.
+3. **Scenes & Prefabs**: All component types (`SoundManager`, `PlaySFX`, `PlayMusic`, `FootstepController`, `AmbientTrigger`, etc.) utilize Unity's `[MovedFrom]` serialization mapping, preserving all existing scene and prefab references without missing scripts.
 
 ---
 
 ## 🌐 Localization
 
 The Signal Dashboard supports 5 languages out of the box:
-- 🇺🇸 English
-- 🇧🇷 Português
-- 🇪🇸 Español
-- 🇯🇵 日本語
-- 🇨🇳 简体中文
+- 🇺🇸 **English**
+- 🇧🇷 **Português**
+- 🇪🇸 **Español**
+- 🇯🇵 **日本語**
+- 🇨🇳 **简体中文**
 
-Switch languages anytime using the dropdown selector in the top right corner of the dashboard.
+Switch languages anytime using the dropdown selector in the top-right corner of the dashboard header.
+
+---
+
+## 🤝 Contributing
+
+Contributions, bug reports, and suggestions are warmly welcome!
+1. Fork the Project.
+2. Create your Feature Branch (`git checkout -b feat/amazing-feature`).
+3. Commit your Changes (`git commit -m "feat: add amazing feature"`).
+4. Push to the Branch (`git push origin feat/amazing-feature`).
+5. Open a Pull Request.
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License**. Created with ❤️ by **[Resenha Studios](https://github.com/Resenha-Studios)**.
+Distributed under the **MIT License**. See [`LICENSE.md`](./LICENSE.md) for more details.
+
+Developed with ❤️ by **[Resenha Studios](https://github.com/Resenha-Studios)**.

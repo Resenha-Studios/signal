@@ -139,7 +139,35 @@ public class AudioExample : MonoBehaviour
 }
 ```
 
-### 3. Settings Menu Integration (Mixer Control)
+### 3. Type-Safe Audio with AudioKeys
+
+Eliminate runtime string typos by generating strongly-typed C# constants with one click in **`Tools > Resenha > Signal > Generate AudioKeys`**:
+
+```csharp
+using Resenha.Signal;
+using UnityEngine;
+
+public class PlayerAudio : MonoBehaviour
+{
+    public void Jump()
+    {
+        // IDE autocomplete with compile-time safety
+        Signal.PlaySFX(AudioKeys.SFX.Jump);
+    }
+
+    public void TriggerExplosion(Vector3 position)
+    {
+        Signal.PlaySFX(AudioKeys.SFX.Explosion, position);
+    }
+
+    public void StartBossBattle()
+    {
+        Signal.PlayMusic(AudioKeys.Music.BossTheme, fadeDuration: 1.5f);
+    }
+}
+```
+
+### 4. Settings Menu Integration (Mixer Control)
 
 Easily link your volume sliders to the Master Audio Mixer with normalized values (`0.0f` to `1.0f`):
 

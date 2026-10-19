@@ -15,14 +15,29 @@ namespace SignalAudioManagerUnity.Communication
         public static long PlaySFX(string audioID, Transform targetTransform, float volumeMultiplier = 1f, float pitchMultiplier = 1f, bool triggerDucking = false, float duckingDuration = 1f)
             => Resenha.Signal.Signal.PlaySFX(audioID, targetTransform, volumeMultiplier, pitchMultiplier, triggerDucking, duckingDuration);
 
+        public static long PlaySFXDelayed(string audioID, float delayInSeconds, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
+            => Resenha.Signal.Signal.PlaySFXDelayed(audioID, delayInSeconds, volumeMultiplier, pitchMultiplier);
+
         public static long PlayDelayedSFX(string audioID, float delayInSeconds, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
             => Resenha.Signal.Signal.PlayDelayedSFX(audioID, delayInSeconds, volumeMultiplier, pitchMultiplier);
 
-        public static long PlayUI(string audioID, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
+        public static long PlaySFXLoop(string audioID, Transform target, float volumeMultiplier = 1f)
+            => Resenha.Signal.Signal.PlaySFXLoop(audioID, target, volumeMultiplier);
+
+        public static long PlayUI(string audioID, float volumeMultiplier = 1f, bool triggerDucking = false, float duckingDuration = 1f)
+            => Resenha.Signal.Signal.PlayUI(audioID, volumeMultiplier, triggerDucking, duckingDuration);
+
+        public static long PlayUI(string audioID, float volumeMultiplier, float pitchMultiplier)
             => Resenha.Signal.Signal.PlayUI(audioID, volumeMultiplier, pitchMultiplier);
 
-        public static void PlayMusic(string audioID, float fadeDuration = 1f)
-            => Resenha.Signal.Signal.PlayMusic(audioID, fadeDuration);
+        public static long PlayUI(string audioID, float volumeMultiplier, float pitchMultiplier, bool triggerDucking, float duckingDuration = 1f)
+            => Resenha.Signal.Signal.PlayUI(audioID, volumeMultiplier, pitchMultiplier, triggerDucking, duckingDuration);
+
+        public static void PlayMusic(string audioID, float fadeDuration = 2.0f, float targetVolume = 1f)
+            => Resenha.Signal.Signal.PlayMusic(audioID, fadeDuration, targetVolume);
+
+        public static void StopMusic()
+            => Resenha.Signal.Signal.StopMusic();
 
         public static void StopMusic(float fadeDuration = 1f)
             => Resenha.Signal.Signal.StopMusic(fadeDuration);

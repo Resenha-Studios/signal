@@ -988,10 +988,10 @@ namespace Resenha.Signal.Editor.UI
                     errorContainer.style.paddingTop = 6;
                     errorContainer.style.paddingBottom = 6;
                     errorContainer.style.paddingLeft = 10;
-                    errorContainer.style.paddingRight = 10;
-                    errorContainer.style.marginTop = 8;
-                    errorContainer.style.borderRadius = 4;
-                    errorContainer.style.borderLeftWidth = 3;
+                    errorContainer.style.borderTopLeftRadius = 4;
+                    errorContainer.style.borderTopRightRadius = 4;
+                    errorContainer.style.borderBottomLeftRadius = 4;
+                    errorContainer.style.borderBottomRightRadius = 4;
                     errorContainer.style.borderLeftColor = new Color(1f, 0.3f, 0.3f);
                     errorContainer.style.display = DisplayStyle.None;
 

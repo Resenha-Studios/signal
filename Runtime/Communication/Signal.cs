@@ -123,7 +123,7 @@ namespace Resenha.Signal
         /// <summary>
         /// Plays a sound effect after a specific delay. Perfect for syncing with animations or particles.
         /// </summary>
-        public static long PlaySFXDelayed(string audioID, float delayInSeconds, float volumeMultiplier = 1f)
+        public static long PlaySFXDelayed(string audioID, float delayInSeconds, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
         {
             EnsureManagerExists();
             long id = _nextInstanceId++;
@@ -133,11 +133,18 @@ namespace Resenha.Signal
                 AudioID = audioID, 
                 Delay = delayInSeconds,
                 VolumeMultiplier = volumeMultiplier,
+                PitchMultiplier = pitchMultiplier,
                 InstanceID = id
             };
             AudioEventChannel.RaisePlayAudio(config);
             return id;
         }
+
+        /// <summary>
+        /// Alias for PlaySFXDelayed.
+        /// </summary>
+        public static long PlayDelayedSFX(string audioID, float delayInSeconds, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
+            => PlaySFXDelayed(audioID, delayInSeconds, volumeMultiplier, pitchMultiplier);
 
         /// <summary>
         /// Plays a looping 3D sound effect attached to a transform.
@@ -183,6 +190,46 @@ namespace Resenha.Signal
             AudioEventChannel.RaisePlayAudio(config);
             return id;
         }
+
+        /// <summary>
+        /// Plays a 2D user interface sound effect with volume and pitch multipliers.
+        /// </summary>
+        public static long PlayUI(string audioID, float volumeMultiplier, float pitchMultiplier)
+        {
+            EnsureManagerExists();
+            long id = _nextInstanceId++;
+            var config = new AudioClipConfig 
+            { 
+                Category = AudioCategory.UI, 
+                AudioID = audioID,
+                VolumeMultiplier = volumeMultiplier,
+                PitchMultiplier = pitchMultiplier,
+                InstanceID = id
+            };
+            AudioEventChannel.RaisePlayAudio(config);
+            return id;
+        }
+
+        /// <summary>
+        /// Plays a 2D user interface sound effect with volume, pitch, and smart ducking options.
+        /// </summary>
+        public static long PlayUI(string audioID, float volumeMultiplier, float pitchMultiplier, bool triggerDucking, float duckingDuration = 1f)
+        {
+            EnsureManagerExists();
+            long id = _nextInstanceId++;
+            var config = new AudioClipConfig 
+            { 
+                Category = AudioCategory.UI, 
+                AudioID = audioID,
+                VolumeMultiplier = volumeMultiplier,
+                PitchMultiplier = pitchMultiplier,
+                InstanceID = id,
+                TriggerDucking = triggerDucking,
+                DuckingDuration = duckingDuration
+            };
+            AudioEventChannel.RaisePlayAudio(config);
+            return id;
+        }
         
         #endregion
 
@@ -219,6 +266,11 @@ namespace Resenha.Signal
         /// Stops the currently playing music track smoothly.
         /// </summary>
         public static void StopMusic() => AudioEventChannel.RaiseStopMusic();
+
+        /// <summary>
+        /// Stops the currently playing music track smoothly with optional fade duration.
+        /// </summary>
+        public static void StopMusic(float fadeDuration) => AudioEventChannel.RaiseStopMusic();
 
         /// <summary>
         /// Pauses the currently playing music track.
@@ -305,14 +357,26 @@ namespace Resenha.Signal.Communication
         public static long PlaySFX(string audioID, Transform targetTransform, float volumeMultiplier = 1f, float pitchMultiplier = 1f, bool triggerDucking = false, float duckingDuration = 1f)
             => Resenha.Signal.Signal.PlaySFX(audioID, targetTransform, volumeMultiplier, pitchMultiplier, triggerDucking, duckingDuration);
 
+        public static long PlaySFXDelayed(string audioID, float delayInSeconds, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
+            => Resenha.Signal.Signal.PlaySFXDelayed(audioID, delayInSeconds, volumeMultiplier, pitchMultiplier);
+
         public static long PlayDelayedSFX(string audioID, float delayInSeconds, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
             => Resenha.Signal.Signal.PlayDelayedSFX(audioID, delayInSeconds, volumeMultiplier, pitchMultiplier);
 
-        public static long PlayUI(string audioID, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
+        public static long PlaySFXLoop(string audioID, Transform target, float volumeMultiplier = 1f)
+            => Resenha.Signal.Signal.PlaySFXLoop(audioID, target, volumeMultiplier);
+
+        public static long PlayUI(string audioID, float volumeMultiplier = 1f, bool triggerDucking = false, float duckingDuration = 1f)
+            => Resenha.Signal.Signal.PlayUI(audioID, volumeMultiplier, triggerDucking, duckingDuration);
+
+        public static long PlayUI(string audioID, float volumeMultiplier, float pitchMultiplier)
             => Resenha.Signal.Signal.PlayUI(audioID, volumeMultiplier, pitchMultiplier);
 
-        public static void PlayMusic(string audioID, float fadeDuration = 1f)
-            => Resenha.Signal.Signal.PlayMusic(audioID, fadeDuration);
+        public static long PlayMusic(string audioID, float fadeDuration = 2.0f, float targetVolume = 1f)
+            => Resenha.Signal.Signal.PlayMusic(audioID, fadeDuration, targetVolume);
+
+        public static void StopMusic()
+            => Resenha.Signal.Signal.StopMusic();
 
         public static void StopMusic(float fadeDuration = 1f)
             => Resenha.Signal.Signal.StopMusic(fadeDuration);

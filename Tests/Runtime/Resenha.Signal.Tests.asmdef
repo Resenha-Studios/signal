@@ -1,14 +1,12 @@
 {
-  "name": "SignalAudioManagerUnity.Editor.Tests",
-  "rootNamespace": "SignalAudioManagerUnity",
+  "name": "Resenha.Signal.Tests",
+  "rootNamespace": "Resenha.Signal.Tests",
   "references": [
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner",
-    "SignalAudioManagerUnity"
+    "Resenha.Signal"
   ],
-  "includePlatforms": [
-    "Editor"
-  ],
+  "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": true,

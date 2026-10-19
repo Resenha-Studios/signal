@@ -1,10 +1,11 @@
-using SignalAudioManagerUnity.Core;
-using SignalAudioManagerUnity.Data;
+using Resenha.Signal.Core;
+using Resenha.Signal.Data;
 using UnityEngine;
 
-namespace SignalAudioManagerUnity.Components
+namespace Resenha.Signal.Components
 {
     [RequireComponent(typeof(Collider))]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "SignalAudioManagerUnity.Components", "SignalAudioManagerUnity")]
     public class AmbientTrigger : MonoBehaviour
     {
         [Header("Trigger Configuration")]

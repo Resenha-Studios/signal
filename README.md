@@ -1,153 +1,138 @@
-# Signal Audio Manager
+# 🎵 Signal
 
-> A robust, zero-friction audio management system for Unity, designed for developers who want AAA audio architecture without the headache.
+> Lightweight, zero-setup audio architecture and sound manager for Unity 6+.  
+> An open-source production toolkit by **[Resenha Studios](https://github.com/Resenha-Studios)**.
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/carlosbobao/signal-audio-manager-unity)
-[![License](https://img.shields.io/badge/license-Commercial-green.svg)](./LICENSE.md)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/Resenha-Studios/signal)
+[![Unity](https://img.shields.io/badge/unity-6000.0%2B-black.svg)](https://unity.com)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE.md)
+[![UI Toolkit](https://img.shields.io/badge/UI%20Toolkit-Standard-purple.svg)](https://docs.unity3d.com/Manual/UIElements.html)
+[![Localization](https://img.shields.io/badge/Languages-EN%20%7C%20PT%20%7C%20ES%20%7C%20JA%20%7C%20ZH-orange.svg)](#localization)
 
-Built on a **UI Toolkit Dashboard**, automated **Lazy Loading**, smart **Object Pooling**, **3D Spatial Controls**, **Surface Footsteps**, and **Strongly Typed Audio Keys** to prevent runtime errors before they happen.
+Built on a modern **UI Toolkit Dashboard**, automated **lazy loading**, smart **object pooling**, **3D spatial audio**, **surface footstep raycasting**, and **type-safe audio keys**.
 
 ---
 
-## Core Features
+## ✨ Features
 
 | Feature | Description |
 |---|---|
-| **1-Click Initial Setup** | Instantly generates your Audio Mixers, Prefabs, and Global Settings in any folder you choose |
-| **UI Toolkit Dashboard** | Manage Music, SFX, and UI sounds from a single, responsive central hub with pagination and search |
-| **Surface Footstep Engine** | Detects Physics Materials and Terrain textures dynamically via Raycast to play ground-specific footstep SFX |
-| **Ambient Trigger Zones (3D & 2D)** | Dynamic audio zones with seamless crossfading, custom volume curves, and exit behaviors |
-| **Fine-Grained 3D Spatialization** | Custom Doppler Level, Spread, Audio Rolloff curves, and Min/Max Distance configurable per sound entry |
-| **Smart Audio Ducking** | Automatically lower background music and ambient sounds when a Voice-Over or UI sound plays |
-| **Automated Lazy Loading** | Call the API from anywhere; Signal auto-instantiates itself safely, no scene setup required |
-| **Smart Audio Pooling** | High-performance Object Pooling for SFX and UI sounds: zero GC spikes, optimal mobile performance |
-| **Typo-Proof API** | Auto-generates a C# script with all your Audio IDs as constants (`AudioKeys.cs`), enabling full IDE autocomplete |
-| **Built-in Interactive Manual** | Full API documentation natively integrated directly into the Unity Editor inside the Signal Dashboard |
+| **Zero-Setup Runtime** | Never drag manager prefabs into scenes. Signal auto-spawns dynamically on first audio call. |
+| **Tools > Resenha > Signal** | Unified Resenha Studio tooling menu with keyboard shortcut (`Ctrl/Cmd + Shift + S`). |
+| **Clean UI Toolkit Dashboard** | AAA minimal dark interface with pagination, instant search, and real-time audio previews. |
+| **5-Language Localization** | Full editor interface localized in English, Portuguese, Spanish, Japanese, and Chinese. |
+| **Surface Footstep Engine** | Detects Physics Materials and Terrain textures dynamically via Raycast for character footsteps. |
+| **Ambient Triggers (3D & 2D)** | Crossfading ambient zones with customizable fade in/out curves and exit behaviors. |
+| **3D Spatial Audio** | Fine-grained Doppler level, speaker spread angle, and min/max rolloff distances per entry. |
+| **Smart Audio Ducking** | Automatically dip background music when dialog or priority sound effects trigger. |
+| **Smart Audio Pooling** | Zero-allocation object pooling for high-intensity SFX and UI sounds. |
+| **AudioKeys Code Generator** | Generates strongly-typed C# constants (`AudioKeys.SFX.jump`) for IDE autocomplete and zero typos. |
+| **Backward Compatible** | Seamless migration path from legacy `SignalAudioManagerUnity` with zero breaking changes. |
 
 ---
 
-## Installation
+## 📦 Installation
 
-### Option A: Unity Package Manager (Recommended)
+### Option A: Unity Package Manager via Git URL (Recommended)
 
-1. Open Unity and go to `Window > Package Manager`
-2. Click `+` and select **Add package from git URL...**
-3. Paste the URL below and click **Add**
-
+1. In Unity, open `Window > Package Manager`.
+2. Click `+` and choose **Add package from git URL...**
+3. Enter the repository URL:
 ```
-https://github.com/carlosbobao/signal-audio-manager.git
+https://github.com/chspDEV/signal-audio-manager-unity.git
 ```
 
-### Option B: Unity Package
+### Option B: OpenUPM / Manifest
 
-1. Download the `.unitypackage` file from the [Releases](../../releases) page
-2. Drag and drop it into your Unity project
-3. Import all files
+Add the dependency to your `Packages/manifest.json`:
+```json
+{
+  "dependencies": {
+    "com.resenha.signal": "https://github.com/chspDEV/signal-audio-manager-unity.git"
+  }
+}
+```
 
 ---
 
-## Quick Start & Usage
+## 🚀 Quick Start
 
-### 1. Basic Sound Playback
+### 1. Initial Setup
+1. Open the dashboard via **`Tools > Resenha > Signal`**.
+2. Click **Initialize Signal** to automatically generate your Audio Mixers, SFX Prefabs, and Configuration assets in your desired folder.
 
-Call Signal from anywhere in your codebase without worrying about scene setup:
+### 2. Playing Audio in Code
 
 ```csharp
-using SignalAudioManagerUnity.Communication;
-using SignalAudioManagerUnity;
+using Resenha.Signal;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerAudio : MonoBehaviour
 {
-    private void Jump()
+    private void Start()
     {
-        // 2D SFX at player position
-        Signal.PlaySFX(AudioKeys.SFX.player_jump, transform.position);
+        // 1. Play background music with 2.0s crossfade
+        Signal.PlayMusic("exploration_theme", 2.0f);
     }
 
-    private void StartGame()
+    public void OnJump()
     {
-        // Play Background Music with fade-in
-        Signal.PlayMusic(AudioKeys.Music.main_menu_theme, fadeInDuration: 1.5f);
+        // 2. Play 2D sound effect
+        Signal.PlaySFX("jump");
+
+        // Or using generated type-safe keys:
+        // Signal.PlaySFX(AudioKeys.SFX.jump);
+    }
+
+    public void OnExplosion(Vector3 worldPos)
+    {
+        // 3. Play 3D sound effect at position with ducking
+        Signal.PlaySFX("explosion", worldPos, triggerDucking: true, duckingDuration: 1.5f);
+    }
+
+    public void OnButtonClick()
+    {
+        // 4. Play UI sound (never paused by Time.timeScale)
+        Signal.PlayUI("btn_click");
     }
 }
 ```
 
----
-
-### 2. Surface-Aware Footstep Engine
-
-Attach `FootstepController` to your player to automatically play surface-specific sound effects based on Ground Physics Materials or Terrain textures:
-
-1. Create a `SurfaceSoundMapSO` (Right-click > `Create > Signal Audio > Surface Sound Map`).
-2. Map Physics Materials or Terrain layers to your SFX Audio IDs (e.g., `footstep_grass`, `footstep_concrete`).
-3. Add `FootstepController` to your player character, assign the map, and choose **Animation Event** or **Velocity-Based** mode.
+### 3. Volume Sliders in Settings Menus
 
 ```csharp
-// Call directly from Animation Events on exact footstep frames
-public void OnFootstepAnimationEvent()
-{
-    footstepController.PlayFootstep();
-}
+// Simple normalized values (0.0f to 1.0f)
+Signal.SetMasterVolume(1.0f);
+Signal.SetMusicVolume(0.8f);
+Signal.SetSFXVolume(0.9f);
+Signal.SetUIVolume(1.0f);
 ```
 
 ---
 
-### 3. Ambient Trigger Zones
+## 🔄 Migrating from v1.x (Signal Audio Manager)
 
-Create immersive 3D or 2D ambient zones (e.g., entering a forest, cave, or underwater):
+Signal v2.0 introduces clean namespaces under `Resenha.Signal.*`. To ensure existing projects do not break:
 
-1. Add an `AmbientTrigger` (3D) or `AmbientTrigger2D` component to a GameObject with a Trigger Collider.
-2. Select your `AmbientTypeSO` and set fade-in / fade-out overrides.
-3. Signal will seamlessly crossfade ambient tracks when the player enters or exits the zone.
-
----
-
-### 4. Fine-Grained 3D Spatial Audio Settings
-
-Configure individual spatial settings directly inside the **Signal Dashboard**:
-- **Spatial Blend**: 2D (0.0) vs 3D (1.0)
-- **Doppler Level**: Set to `0` to prevent pitch distortion on fast-moving cameras
-- **Spread & Min/Max Distance**: Fine-tune volume decay spheres for 3D environments
-- **Audio Rolloff Mode**: Logarithmic, Linear, or Custom curves
+1. **API Calls**: Calling `Signal.PlaySFX(...)` or `Signal.PlayMusic(...)` works out of the box.
+2. **Old Namespaces**: `using SignalAudioManagerUnity.Communication;`, `SignalAudioManagerUnity.Core;`, `SignalAudioManagerUnity.Data;`, and `SignalAudioManagerUnity.Components;` are fully supported via backward-compatible proxy types with `[Obsolete]` guides.
+3. **Scenes & Prefabs**: All component types (`SoundManager`, `PlaySFX`, `FootstepController`, etc.) utilize Unity's `[MovedFrom]` serialization mapping, preserving all scene and prefab references without data loss.
 
 ---
 
-## Strongly Typed Audio Keys
+## 🌐 Localization
 
-Typing strings like `"player_jump"` manually leads to typos and silent runtime bugs. Signal solves this with a **1-Click Code Generator**.
+The Signal Dashboard supports 5 languages out of the box:
+- 🇺🇸 English
+- 🇧🇷 Português
+- 🇪🇸 Español
+- 🇯🇵 日本語
+- 🇨🇳 简体中文
 
-1. Open `ResenhaTools > Signal > Dashboard`
-2. Go to the **Global Settings** tab
-3. Click **Generate AudioKeys.cs**
-
-Signal creates a static class with all your Audio IDs. Your IDE will autocomplete every sound, completely typo-proof.
-
-```csharp
-// Full IDE autocomplete, no more guessing string names!
-Signal.PlaySFX(AudioKeys.SFX.player_jump, transform.position);
-```
+Switch languages anytime using the dropdown selector in the top right corner of the dashboard.
 
 ---
 
-## Roadmap
+## 📄 License
 
-- [x] **Advanced Ambient Trigger Zones (3D & 2D)**: Dynamic audio zones with seamless crossfading, custom volume curves, and exit behaviors
-- [x] **Smart Audio Ducking**: Automatically lower background music and ambient sounds when a Voice-Over or UI sound plays
-- [x] **Surface-Aware Footstep Engine**: Plug-and-play system detecting Physics Materials and Terrain textures to trigger surface sound effects
-- [x] **Fine-Grained 3D Spatialization Controls**: Custom Doppler, Spread, Rolloff, and Min/Max distances configurable per sound entry
-- [ ] **Dynamic Audio Occlusion (Raycasting)**: Real-time spatial acoustics; sounds behind walls automatically apply Low-Pass filters to simulate realistic muffling
-- [ ] **Adaptive Music System (Stems)**: Dynamically fade individual instrument layers in and out based on game intensity
-- [ ] **In-Scene Visual Debugger**: Scene View visualizer showing active audio pools, 3D spatialization spheres, and occlusion raycasts
-
----
-
-## License
-
-This asset is provided under a **Commercial EULA**. You are free to use it in personal and commercial compiled end products (e.g., video games). Reselling, sub-licensing, or redistributing the source code as a standalone product is strictly prohibited.
-
-See [LICENSE.md](./LICENSE.md) for full details.
-
----
-
-<p align="center">Copyright © 2026 carlosbobao. All rights reserved.</p>
+Distributed under the **MIT License**. Created with ❤️ by **[Resenha Studios](https://github.com/Resenha-Studios)**.

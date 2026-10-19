@@ -7,12 +7,13 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using SignalAudioManagerUnity.Communication;
-using SignalAudioManagerUnity.Data;
+using Resenha.Signal.Communication;
+using Resenha.Signal.Data;
 using UnityEngine;
 
-namespace SignalAudioManagerUnity.Core
+namespace Resenha.Signal.Core
 {
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "SignalAudioManagerUnity.Core", "SignalAudioManagerUnity")]
     public class SoundManager : MonoBehaviour
     {
         public static SoundManager Instance { get; private set; }

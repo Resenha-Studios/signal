@@ -1,8 +1,9 @@
-using SignalAudioManagerUnity.Communication;
+using Resenha.Signal.Communication;
 using UnityEngine;
 
-namespace SignalAudioManagerUnity.Components
+namespace Resenha.Signal.Components
 {
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "SignalAudioManagerUnity.Components", "SignalAudioManagerUnity")]
     public class PlayMusic : MonoBehaviour
     {
         [SerializeField] private bool playOnStart = false;

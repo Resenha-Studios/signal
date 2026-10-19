@@ -9,9 +9,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SignalAudioManagerUnity.Data
+namespace Resenha.Signal.Data
 {
-    [CreateAssetMenu(fileName = "SurfaceSoundMap", menuName = "Signal Audio/Surface Sound Map")]
+    [CreateAssetMenu(fileName = "SurfaceSoundMap", menuName = "Resenha/Signal/Surface Sound Map")]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "SignalAudioManagerUnity.Data", "SignalAudioManagerUnity")]
     public class SurfaceSoundMapSO : ScriptableObject
     {
         // ==========================================

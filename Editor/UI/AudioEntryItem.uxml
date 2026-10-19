@@ -3,28 +3,28 @@
     <ui:VisualElement class="audio-entry-card">
         
         <ui:VisualElement class="audio-entry-header">
-            <ui:TextField name="audio-id-field" label="Audio ID:" class="audio-id-field" />
-            <ui:Button name="btn-play" text="►" class="icon-btn play-btn" />
-            <ui:Button name="btn-stop" text="■" class="icon-btn stop-btn" />
-            <ui:Button name="btn-delete" text="✖" class="icon-btn delete-btn" />
+            <ui:TextField name="audio-id-field" label="Audio ID" class="audio-id-field" tooltip="Unique ID used to call this audio event in code" />
+            <ui:Button name="btn-play" text="▶" class="icon-btn play-btn" tooltip="Play preview" />
+            <ui:Button name="btn-stop" text="■" class="icon-btn stop-btn" tooltip="Stop preview" />
+            <ui:Button name="btn-delete" text="✕" class="icon-btn delete-btn" tooltip="Delete this audio entry" />
         </ui:VisualElement>
         
         <ui:Foldout text="Details &amp; Variations" class="audio-entry-foldout">
-            <uie:PropertyField name="audio-clips-field" label="Audio Clips" />
+            <uie:PropertyField name="audio-clips-field" label="Audio Clips" tooltip="List of clips to play randomly for variation" />
             
             <ui:VisualElement class="sliders-container">
-                <uie:PropertyField name="min-vol-field" label="Min Volume" />
-                <uie:PropertyField name="max-vol-field" label="Max Volume" />
-                <uie:PropertyField name="min-pitch-field" label="Min Pitch" />
-                <uie:PropertyField name="max-pitch-field" label="Max Pitch" />
+                <uie:PropertyField name="min-vol-field" label="Min Volume" tooltip="Minimum randomized volume" />
+                <uie:PropertyField name="max-vol-field" label="Max Volume" tooltip="Maximum randomized volume" />
+                <uie:PropertyField name="min-pitch-field" label="Min Pitch" tooltip="Minimum randomized pitch" />
+                <uie:PropertyField name="max-pitch-field" label="Max Pitch" tooltip="Maximum randomized pitch" />
             </ui:VisualElement>
 
             <ui:VisualElement class="sliders-container">
-                <uie:PropertyField name="spatial-blend-field" label="Spatial Blend" />
-                <uie:PropertyField name="doppler-level-field" label="Doppler Level" />
-                <uie:PropertyField name="spread-field" label="Spread" />
-                <uie:PropertyField name="min-distance-field" label="Min Distance" />
-                <uie:PropertyField name="max-distance-field" label="Max Distance" />
+                <uie:PropertyField name="spatial-blend-field" label="Spatial Blend" tooltip="0 = 2D Sound, 1 = 3D Spatial Sound" />
+                <uie:PropertyField name="doppler-level-field" label="Doppler Level" tooltip="Doppler effect pitch change on moving objects" />
+                <uie:PropertyField name="spread-field" label="Spread" tooltip="Speaker spread angle for 3D sound" />
+                <uie:PropertyField name="min-distance-field" label="Min Distance" tooltip="Distance where audio is at 100% volume" />
+                <uie:PropertyField name="max-distance-field" label="Max Distance" tooltip="Distance where audio reaches 0% volume" />
             </ui:VisualElement>
         </ui:Foldout>
         

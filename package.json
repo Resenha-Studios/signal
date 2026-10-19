@@ -1,19 +1,33 @@
 {
-  "name": "com.resenhastudio.signalaudiomanagerunity",
-  "version": "1.1.0",
-  "displayName": "Signal Audio Manager (Unity)",
-  "description": "Unity Sound Manager for Game Developers",
+  "name": "com.resenha.signal",
+  "version": "2.0.0",
+  "displayName": "Signal",
+  "description": "Lightweight, zero-setup audio architecture and sound manager for Unity 6+ with dynamic pooling, crossfades, multi-language support, and UI Toolkit dashboard.",
+  "unity": "6000.0",
+  "unityRelease": "0b1",
+  "license": "MIT",
+  "dependencies": {
+    "com.unity.localization": "1.5.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chspDEV/signal-audio-manager-unity.git"
+  },
   "keywords": [
+    "signal",
     "audio",
     "sound",
     "manager",
     "sfx",
-    "music"
+    "music",
+    "pooling",
+    "ui-toolkit",
+    "resenha",
+    "open-source",
+    "unity"
   ],
   "author": {
-    "name": "carlosbobao",
-    "url": "https://carlosbobao.itch.io",
-    "email": "chspcontato@gmail.com"
-  },
-  "unity": "6000.0"
+    "name": "Resenha Studios",
+    "url": "https://github.com/Resenha-Studios"
+  }
 }

@@ -1,12 +1,12 @@
-using SignalAudioManagerUnity.Data;
+using Resenha.Signal.Data;
 using System;
 using System.Collections;
 using UnityEngine;
 
-namespace SignalAudioManagerUnity.Core
+namespace Resenha.Signal.Core
 {
-
     [RequireComponent(typeof(AudioSource))]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "SignalAudioManagerUnity.Core", "SignalAudioManagerUnity")]
     public class PooledAudioSource : MonoBehaviour
     {
         private AudioSource _audioSource;

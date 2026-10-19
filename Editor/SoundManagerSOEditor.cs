@@ -1,40 +1,39 @@
-﻿/* ==============================================================================
+/* ==============================================================================
  * CLASS: SoundManagerSOEditor
- * DESCRIPTION: Custom Inspector for the SoundManagerSO. Prevents raw data editing
- * and redirects the user to the modern UI Toolkit Dashboard for a better UX.
+ * DESCRIPTION: Custom Inspector for SoundManagerSO. Redirects to the UI Toolkit
+ * Signal Dashboard for clean, centralized management.
  * ==============================================================================*/
 using UnityEditor;
 using UnityEngine;
-using SignalAudioManagerUnity.Data; 
-using SignalAudioManagerUnity.Editor.UI; 
+using Resenha.Signal.Data;
+using Resenha.Signal.Editor.UI;
 
-namespace SignalAudioManagerUnity.Editor
+namespace Resenha.Signal.Editor
 {
     [CustomEditor(typeof(SoundManagerSO))]
     public class SoundManagerSOEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.Space(15);
+            EditorGUILayout.Space(12);
             
             EditorGUILayout.HelpBox(
-                "Signal Audio Manager uses a dedicated, high-performance UI Toolkit Dashboard. " +
-                "Please use the Dashboard to manage your audio libraries, import tools, and global settings safely.", 
+                "Signal utilizes a high-performance UI Toolkit Dashboard. Use the dashboard to manage audio libraries, import rules, and mixer settings safely.", 
                 MessageType.Info);
             
-            EditorGUILayout.Space(15);
+            EditorGUILayout.Space(12);
             
             Color originalColor = GUI.backgroundColor;
-            GUI.backgroundColor = new Color(0.18f, 0.42f, 0.2f); 
+            GUI.backgroundColor = new Color(0.12f, 0.44f, 0.55f); 
             
-            if (GUILayout.Button("🚀 Open Signal Dashboard", GUILayout.Height(45)))
+            if (GUILayout.Button("Open Signal Dashboard", GUILayout.Height(40)))
             {
                 SignalAudioDashboard.ShowWindow();
             }
             
             GUI.backgroundColor = originalColor;
             
-            EditorGUILayout.Space(15);
+            EditorGUILayout.Space(10);
         }
     }
 }

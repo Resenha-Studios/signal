@@ -1,8 +1,9 @@
 {
-    "name": "SignalAudioManagerUnity.Editor",
-    "rootNamespace": "SignalAudioManagerUnity",
+    "name": "Resenha.Signal.Editor",
+    "rootNamespace": "Resenha.Signal.Editor",
     "references": [
-        "GUID:158644b6615725a45b6167c71ed88429"
+        "GUID:158644b6615725a45b6167c71ed88429",
+        "Unity.Localization"
     ],
     "includePlatforms": [
         "Editor"

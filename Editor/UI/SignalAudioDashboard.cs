@@ -1,23 +1,27 @@
 /* ==============================================================================
  * CLASS: SignalAudioDashboard
- * DESCRIPTION: Main Editor Window. Handles 1-Click Initial Setup generation,
- * tab navigation, automated data binding, and audio preview playback.
+ * DESCRIPTION: Main Editor Window for Signal Audio Architecture. Handles 1-Click
+ * initial setup, audio library management, import tools, batch renaming, 
+ * audio previews, and code generation for AudioKeys.
+ * Standardized for Resenha Studios with UI Toolkit & Multi-language localization.
  * ==============================================================================*/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
-using SignalAudioManagerUnity.Core;
-using SignalAudioManagerUnity.Data;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using Resenha.Signal.Core;
+using Resenha.Signal.Data;
+using Resenha.Signal.Editor.Localization;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UIElements;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Linq;
 
-namespace SignalAudioManagerUnity.Editor.UI
+namespace Resenha.Signal.Editor.UI
 {
     public class SignalAudioDashboard : EditorWindow
     {
@@ -25,17 +29,20 @@ namespace SignalAudioManagerUnity.Editor.UI
         private VisualElement _welcomeScreen;
         private VisualElement _mainContent;
         private UQueryState<Button> _sidebarButtons;
+        private Button _activeTabButton;
         private SerializedObject _serializedConfig;
         
         private AudioSource _previewSource;
         private GameObject _previewObject;
 
-        [MenuItem("ResenhaTools/Signal/Dashboard")]
+        [MenuItem("Tools/Resenha/Signal %s", priority = 101)]
+        [MenuItem("ResenhaTools/Signal/Dashboard", priority = 999)]
         public static void ShowWindow()
         {
             SignalAudioDashboard wnd = GetWindow<SignalAudioDashboard>();
-            wnd.titleContent = new GUIContent("Signal Dashboard");
-            wnd.minSize = new Vector2(800, 500); 
+            wnd.titleContent = new GUIContent("Signal", EditorGUIUtility.IconContent("d_AudioSource Icon").image);
+            wnd.minSize = new Vector2(760, 480);
+            wnd.Show();
         }
 
         private void OnEnable()
@@ -103,11 +110,63 @@ namespace SignalAudioManagerUnity.Editor.UI
             Button setupBtn = root.Q<Button>("btn-initial-setup");
             if (setupBtn != null) setupBtn.clicked += RunInitialSetupWithFolderPicker;
 
+            Button headerSetupBtn = root.Q<Button>("btn-header-setup");
+            if (headerSetupBtn != null) headerSetupBtn.clicked += RunInitialSetupWithFolderPicker;
+
+            SetupLanguageSelector(root);
             InitializeTabs(root);
+            ApplyLocalization(root);
             UpdateUIState();
             root.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
-        
+
+        private void SetupLanguageSelector(VisualElement root)
+        {
+            var dropdown = root.Q<DropdownField>("language-dropdown");
+            if (dropdown == null) return;
+
+            dropdown.choices = new List<string> { "English", "Português", "Español", "日本語", "简体中文" };
+            dropdown.index = (int)SignalStrings.CurrentLanguage;
+
+            dropdown.RegisterValueChangedCallback(evt =>
+            {
+                int idx = dropdown.choices.IndexOf(evt.newValue);
+                if (idx >= 0)
+                {
+                    SignalStrings.CurrentLanguage = (SignalLanguage)idx;
+                    ApplyLocalization(root);
+                    if (_activeTabButton != null)
+                    {
+                        LoadTabContent(_activeTabButton.name);
+                    }
+                }
+            });
+        }
+
+        private void ApplyLocalization(VisualElement root)
+        {
+            SetLabelText(root.Q<Label>("header-title"), SignalStrings.Get("window_title"));
+            SetLabelText(root.Q<Label>("header-subtitle"), SignalStrings.Get("window_subtitle"));
+            
+            SetLabelText(root.Q<Label>("welcome-title"), SignalStrings.Get("welcome_title"));
+            SetLabelText(root.Q<Label>("welcome-subtitle"), SignalStrings.Get("welcome_subtitle"));
+            SetLabelText(root.Q<Label>("welcome-desc"), SignalStrings.Get("welcome_desc"));
+            
+            var welcomeBtn = root.Q<Button>("btn-initial-setup");
+            if (welcomeBtn != null) welcomeBtn.text = SignalStrings.Get("welcome_btn");
+
+            SetLabelText(root.Q<Label>("lbl-tab-global"), SignalStrings.Get("tab_global"));
+            SetLabelText(root.Q<Label>("lbl-tab-music"), SignalStrings.Get("tab_music"));
+            SetLabelText(root.Q<Label>("lbl-tab-sfx"), SignalStrings.Get("tab_sfx"));
+            SetLabelText(root.Q<Label>("lbl-tab-tools"), SignalStrings.Get("tab_tools"));
+            SetLabelText(root.Q<Label>("lbl-tab-help"), SignalStrings.Get("tab_help"));
+        }
+
+        private void SetLabelText(Label label, string text)
+        {
+            if (label != null) label.text = text;
+        }
+
         private void RunInitialSetupWithFolderPicker()
         {
             string selectedPath = EditorUtility.OpenFolderPanel("Select Setup Folder", "Assets", "");
@@ -158,7 +217,10 @@ namespace SignalAudioManagerUnity.Editor.UI
                 _welcomeScreen.style.display = DisplayStyle.None;
                 
                 var firstBtn = _dashboardContainer.Q<Button>("tab-global");
-                if (firstBtn != null) LoadTabContent(firstBtn.name);
+                if (firstBtn != null) 
+                {
+                    OnTabClicked(firstBtn);
+                }
             }
         }
 
@@ -198,6 +260,7 @@ namespace SignalAudioManagerUnity.Editor.UI
             }
 
             clickedButton.AddToClassList("sidebar-btn-active");
+            _activeTabButton = clickedButton;
             LoadTabContent(clickedButton.name);
         }
 
@@ -214,10 +277,10 @@ namespace SignalAudioManagerUnity.Editor.UI
                     LoadGlobalSettingsTab();
                     break;
                 case "tab-music":
-                    LoadLibraryTab("Music Library Management", "musicDatabase");
+                    LoadLibraryTab(SignalStrings.Get("music_title"), "musicDatabase");
                     break;
                 case "tab-sfx":
-                    LoadLibraryTab("SFX & UI Audio Management", "sfxDatabase");
+                    LoadLibraryTab(SignalStrings.Get("sfx_title"), "sfxDatabase");
                     break;
                 case "tab-tools":
                     LoadImportToolsTab();
@@ -237,19 +300,32 @@ namespace SignalAudioManagerUnity.Editor.UI
             var content = visualTree.Instantiate();
             content.Bind(_serializedConfig);
             
+            // Apply localization to Global Settings
+            SetLabelText(content.Q<Label>("lbl-mixer-section"), SignalStrings.Get("mixer_section"));
+            SetLabelText(content.Q<Label>("lbl-assets-section"), SignalStrings.Get("assets_section"));
+            SetLabelText(content.Q<Label>("lbl-general-section"), SignalStrings.Get("general_section"));
+            SetLabelText(content.Q<Label>("lbl-codegen-section"), SignalStrings.Get("codegen_section"));
+            SetLabelText(content.Q<Label>("lbl-codegen-desc"), SignalStrings.Get("codegen_desc"));
+            SetLabelText(content.Q<Label>("lbl-codegen-example"), SignalStrings.Get("codegen_example"));
+
+            var btnChangePath = content.Q<Button>("btn-change-keys-path");
+            if (btnChangePath != null) btnChangePath.text = SignalStrings.Get("btn_change_path");
+
+            var btnGenKeys = content.Q<Button>("btn-generate-keys");
+            if (btnGenKeys != null) btnGenKeys.text = SignalStrings.Get("btn_generate_keys");
+
             TextField pathField = content.Q<TextField>("keys-path-field");
             if (pathField != null)
             {
                 pathField.value = EditorPrefs.GetString("SignalAudio_KeysPath", "Default (Assets or Manager Location)");
             }
 
-            Button changePathBtn = content.Q<Button>("btn-change-keys-path");
-            if (changePathBtn != null)
+            if (btnChangePath != null)
             {
-                changePathBtn.clicked += () =>
+                btnChangePath.clicked += () =>
                 {
                     string currentPath = EditorPrefs.GetString("SignalAudio_KeysPath", "Assets");
-                    string defaultDir = System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(currentPath)) ? System.IO.Path.GetDirectoryName(currentPath) : "Assets";
+                    string defaultDir = Directory.Exists(Path.GetDirectoryName(currentPath)) ? Path.GetDirectoryName(currentPath) : "Assets";
                     
                     string newPath = EditorUtility.SaveFilePanelInProject(
                         "Select AudioKeys Export Location", 
@@ -266,42 +342,35 @@ namespace SignalAudioManagerUnity.Editor.UI
                 };
             }
 
-            Button generateBtn = content.Q<Button>("btn-generate-keys");
-            if (generateBtn != null)
+            if (btnGenKeys != null)
             {
-                generateBtn.clicked += GenerateAudioKeysScript;
+                btnGenKeys.clicked += GenerateKeysCode;
             }
 
             _mainContent.Add(content);
         }
-        
-        // ==========================================
-        // CODE GENERATOR (AUDIO KEYS)
-        // ==========================================
-        private void GenerateAudioKeysScript()
+
+        private void GenerateKeysCode()
         {
-            if (_serializedConfig == null || _serializedConfig.targetObject == null) return;
-
+            if (_serializedConfig == null) return;
+            _serializedConfig.Update();
             SoundManagerSO data = _serializedConfig.targetObject as SoundManagerSO;
-            
-            string filePath = EditorPrefs.GetString("SignalAudio_KeysPath", "");
-            
-            if (string.IsNullOrEmpty(filePath) || !System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(filePath)))
-            {
-                string defaultDir = "Assets";
-                string soPath = AssetDatabase.GetAssetPath(data);
-                if (!string.IsNullOrEmpty(soPath)) 
-                {
-                    defaultDir = System.IO.Path.GetDirectoryName(soPath);
-                }
+            if (data == null) return;
 
+            string filePath = EditorPrefs.GetString("SignalAudio_KeysPath", "");
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                string configPath = AssetDatabase.GetAssetPath(data);
+                string configDir = !string.IsNullOrEmpty(configPath) ? Path.GetDirectoryName(configPath) : "Assets";
                 filePath = EditorUtility.SaveFilePanelInProject(
-                    "Save AudioKeys Script", 
-                    "AudioKeys", 
-                    "cs", 
-                    "Choose where to save the generated AudioKeys script.", 
-                    defaultDir);
-                
+                    "Save AudioKeys Script",
+                    "AudioKeys",
+                    "cs",
+                    "Choose where to save the generated AudioKeys script.",
+                    configDir
+                );
+
                 if (string.IsNullOrEmpty(filePath)) return;
 
                 EditorPrefs.SetString("SignalAudio_KeysPath", filePath);
@@ -309,17 +378,17 @@ namespace SignalAudioManagerUnity.Editor.UI
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("/* ==============================================================================");
-            sb.AppendLine(" * AUTO-GENERATED BY SIGNAL AUDIO MANAGER");
-            sb.AppendLine(" * DESCRIPTION: Strongly-typed audio IDs to prevent typos and enable autocomplete.");
-            sb.AppendLine(" * Do not modify this file manually. Regenerate it from the Signal Dashboard.");
+            sb.AppendLine(" * AUTO-GENERATED BY SIGNAL (Resenha Studios)");
+            sb.AppendLine(" * Strongly-typed audio IDs to prevent typos and enable IDE autocomplete.");
+            sb.AppendLine(" * Do not modify this file manually. Regenerate from Tools > Resenha > Signal.");
             sb.AppendLine(" * ==============================================================================*/");
             sb.AppendLine();
-            sb.AppendLine("namespace SignalAudioManagerUnity");
+            sb.AppendLine("namespace Resenha.Signal");
             sb.AppendLine("{");
             sb.AppendLine("    public static class AudioKeys");
             sb.AppendLine("    {");
 
-            // --- SFX CLASS ---
+            // SFX
             sb.AppendLine("        public static class SFX");
             sb.AppendLine("        {");
             foreach (var entry in data.sfxDatabase)
@@ -331,7 +400,7 @@ namespace SignalAudioManagerUnity.Editor.UI
             sb.AppendLine("        }");
             sb.AppendLine();
 
-            // --- MUSIC CLASS ---
+            // MUSIC
             sb.AppendLine("        public static class Music");
             sb.AppendLine("        {");
             foreach (var entry in data.musicDatabase)
@@ -341,22 +410,55 @@ namespace SignalAudioManagerUnity.Editor.UI
                 sb.AppendLine($"            public const string {safeName} = \"{entry.audioID}\";");
             }
             sb.AppendLine("        }");
-
             sb.AppendLine("    }");
             sb.AppendLine("}");
-            
-            System.IO.File.WriteAllText(filePath, sb.ToString());
-            
-            AssetDatabase.Refresh(); 
-            
-            EditorUtility.DisplayDialog("Success", $"AudioKeys.cs generated successfully at:\n{filePath}\n\nYou can now use AudioKeys.SFX.your_sound in your scripts.", "OK");
+            sb.AppendLine();
+
+            // Legacy backward compatibility alias
+            sb.AppendLine("namespace SignalAudioManagerUnity");
+            sb.AppendLine("{");
+            sb.AppendLine("    [System.Obsolete(\"SignalAudioManagerUnity.AudioKeys is deprecated. Please use Resenha.Signal.AudioKeys instead.\")]");
+            sb.AppendLine("    public static class AudioKeys");
+            sb.AppendLine("    {");
+            sb.AppendLine("        public static class SFX");
+            sb.AppendLine("        {");
+            foreach (var entry in data.sfxDatabase)
+            {
+                if (string.IsNullOrWhiteSpace(entry.audioID)) continue;
+                string safeName = SanitizeVariableName(entry.audioID);
+                sb.AppendLine($"            public const string {safeName} = Resenha.Signal.AudioKeys.SFX.{safeName};");
+            }
+            sb.AppendLine("        }");
+            sb.AppendLine();
+            sb.AppendLine("        public static class Music");
+            sb.AppendLine("        {");
+            foreach (var entry in data.musicDatabase)
+            {
+                if (string.IsNullOrWhiteSpace(entry.audioID)) continue;
+                string safeName = SanitizeVariableName(entry.audioID);
+                sb.AppendLine($"            public const string {safeName} = Resenha.Signal.AudioKeys.Music.{safeName};");
+            }
+            sb.AppendLine("        }");
+            sb.AppendLine("    }");
+            sb.AppendLine("}");
+
+            try
+            {
+                File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+                AssetDatabase.Refresh();
+                EditorUtility.DisplayDialog("AudioKeys Generated", SignalStrings.Get("keys_success"), "OK");
+            }
+            catch (Exception ex)
+            {
+                EditorUtility.DisplayDialog("Code Generation Error", $"Failed to generate script:\n{ex.Message}", "OK");
+            }
         }
-        
-        private string SanitizeVariableName(string input)
+
+        private string SanitizeVariableName(string rawName)
         {
-            if (string.IsNullOrWhiteSpace(input)) return "_empty";
-            
-            string clean = Regex.Replace(input, @"[^a-zA-Z0-9_]", "_");
+            if (string.IsNullOrEmpty(rawName)) return "_empty";
+            string clean = Regex.Replace(rawName, @"[^a-zA-Z0-9_]", "_");
+            if (string.IsNullOrEmpty(clean)) return "_audio";
             
             if (char.IsDigit(clean[0]))
             {
@@ -376,9 +478,17 @@ namespace SignalAudioManagerUnity.Editor.UI
 
             content.Q<Label>("library-title").text = title;
 
-            // Foldout state per list index (the true SerializedProperty index)
-            var foldoutStates = new Dictionary<int, bool>();
+            // Apply localization
+            var btnCollapse = content.Q<Button>("btn-collapse-all");
+            if (btnCollapse != null) btnCollapse.text = SignalStrings.Get("btn_collapse");
 
+            var btnExpand = content.Q<Button>("btn-expand-all");
+            if (btnExpand != null) btnExpand.text = SignalStrings.Get("btn_expand");
+
+            var btnDeleteAll = content.Q<Button>("btn-delete-all");
+            if (btnDeleteAll != null) btnDeleteAll.text = SignalStrings.Get("btn_delete_all");
+
+            var foldoutStates = new Dictionary<int, bool>();
             string currentSearchText = "";
             var searchField = content.Q<ToolbarSearchField>("audio-search-field");
 
@@ -397,7 +507,6 @@ namespace SignalAudioManagerUnity.Editor.UI
 
                 filteredIndices.Clear();
 
-                // Build filtered list
                 for (int i = 0; i < totalItems; i++)
                 {
                     if (string.IsNullOrEmpty(currentSearchText))
@@ -424,13 +533,10 @@ namespace SignalAudioManagerUnity.Editor.UI
 
                 if (lblPageInfo != null)
                 {
-                    lblPageInfo.text = $"Page {currentPage + 1} of {totalPages} (Total: {totalItems})";
+                    lblPageInfo.text = SignalStrings.Get("page_info", currentPage + 1, totalPages) + $" (Total: {totalItems})";
                 }
 
-                // Get indices for current page
                 var pageIndices = filteredIndices.Skip(currentPage * itemsPerPage).Take(itemsPerPage).ToList();
-                
-                // Set the list view items source to our small list of indices
                 listView.itemsSource = pageIndices;
                 listView.RefreshItems();
             }
@@ -440,12 +546,11 @@ namespace SignalAudioManagerUnity.Editor.UI
                 searchField.RegisterValueChangedCallback(evt =>
                 {
                     currentSearchText = evt.newValue?.ToLowerInvariant() ?? "";
-                    currentPage = 0; // Reset to page 1 on search
+                    currentPage = 0;
                     UpdatePagination();
                 });
             }
 
-            // Pagination Controls
             var btnPrev = content.Q<Button>("btn-prev-page");
             var btnNext = content.Q<Button>("btn-next-page");
             var btnAdd = content.Q<Button>("btn-add-item");
@@ -484,7 +589,6 @@ namespace SignalAudioManagerUnity.Editor.UI
                     listProperty.arraySize++;
                     _serializedConfig.ApplyModifiedProperties();
                     
-                    // Jump to last page
                     currentSearchText = "";
                     if (searchField != null) searchField.value = "";
                     
@@ -492,8 +596,6 @@ namespace SignalAudioManagerUnity.Editor.UI
                     currentPage = Mathf.Max(0, Mathf.CeilToInt((float)newTotal / itemsPerPage) - 1);
                     
                     UpdatePagination();
-                    
-                    // Scroll to bottom
                     listView.ScrollToItem(-1);
                 };
             }
@@ -509,7 +611,6 @@ namespace SignalAudioManagerUnity.Editor.UI
                         listProperty.DeleteArrayElementAtIndex(realIndex);
                         _serializedConfig.ApplyModifiedProperties();
                         
-                        // Clear foldout state
                         if (foldoutStates.ContainsKey(realIndex)) foldoutStates.Remove(realIndex);
                         
                         UpdatePagination();
@@ -519,50 +620,41 @@ namespace SignalAudioManagerUnity.Editor.UI
 
             BindListView(listView, propertyName, foldoutStates, (realIndex) => 
             {
-                SerializedProperty listProp = _serializedConfig.FindProperty(propertyName);
-                listProp.DeleteArrayElementAtIndex(realIndex);
+                SerializedProperty listProperty = _serializedConfig.FindProperty(propertyName);
+                listProperty.DeleteArrayElementAtIndex(realIndex);
                 _serializedConfig.ApplyModifiedProperties();
                 if (foldoutStates.ContainsKey(realIndex)) foldoutStates.Remove(realIndex);
                 UpdatePagination();
             });
 
-            // Initial load
-            UpdatePagination();
-
-            // Wire Collapse All button
-            var btnCollapse = content.Q<Button>("btn-collapse-all");
             if (btnCollapse != null)
             {
                 btnCollapse.clicked += () =>
                 {
-                    foldoutStates.Clear(); // all keys missing → default false
-                    listView?.RefreshItems();
+                    SerializedProperty listProperty = _serializedConfig.FindProperty(propertyName);
+                    for (int i = 0; i < listProperty.arraySize; i++) foldoutStates[i] = false;
+                    listView.Query<Foldout>().ForEach(f => f.value = false);
                 };
             }
 
-            // Wire Expand All button
-            var btnExpand = content.Q<Button>("btn-expand-all");
             if (btnExpand != null)
             {
                 btnExpand.clicked += () =>
                 {
-                    SerializedProperty prop = _serializedConfig.FindProperty(propertyName);
-                    int count = prop?.arraySize ?? 0;
-                    for (int i = 0; i < count; i++) foldoutStates[i] = true;
-                    listView?.RefreshItems();
+                    SerializedProperty listProperty = _serializedConfig.FindProperty(propertyName);
+                    for (int i = 0; i < listProperty.arraySize; i++) foldoutStates[i] = true;
+                    listView.Query<Foldout>().ForEach(f => f.value = true);
                 };
             }
 
-            // Wire Delete All button
-            var btnDeleteAll = content.Q<Button>("btn-delete-all");
             if (btnDeleteAll != null)
             {
                 btnDeleteAll.clicked += () =>
                 {
-                    if (EditorUtility.DisplayDialog("Delete All Audios", "Are you sure you want to delete ALL audio entries in this library? This cannot be undone.", "Yes, Delete All", "Cancel"))
+                    if (EditorUtility.DisplayDialog("Clear Audio Database", $"Are you sure you want to delete all entries in {title}?", "Delete All", "Cancel"))
                     {
-                        SerializedProperty prop = _serializedConfig.FindProperty(propertyName);
-                        prop.ClearArray();
+                        SerializedProperty listProperty = _serializedConfig.FindProperty(propertyName);
+                        listProperty.ClearArray();
                         _serializedConfig.ApplyModifiedProperties();
                         foldoutStates.Clear();
                         currentPage = 0;
@@ -571,7 +663,7 @@ namespace SignalAudioManagerUnity.Editor.UI
                 };
             }
 
-            content.Bind(_serializedConfig);
+            UpdatePagination();
             _mainContent.Add(content);
         }
 
@@ -582,8 +674,6 @@ namespace SignalAudioManagerUnity.Editor.UI
 
             var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(guids[0]));
             var content = visualTree.Instantiate();
-
-
             _mainContent.Add(content);
         }
 
@@ -595,41 +685,54 @@ namespace SignalAudioManagerUnity.Editor.UI
             var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(guids[0]));
             var content = visualTree.Instantiate();
 
+            // Apply localization
+            SetLabelText(content.Q<Label>("lbl-rules-title"), SignalStrings.Get("rules_title"));
+            SetLabelText(content.Q<Label>("lbl-rules-desc"), SignalStrings.Get("rules_desc"));
+            SetLabelText(content.Q<Label>("lbl-music-importer"), SignalStrings.Get("music_importer"));
+            SetLabelText(content.Q<Label>("lbl-sfx-importer"), SignalStrings.Get("sfx_importer"));
+            SetLabelText(content.Q<Label>("lbl-batch-renamer"), SignalStrings.Get("batch_renamer"));
+
+            var btnMusic = content.Q<Button>("btn-run-import-music");
+            if (btnMusic != null) btnMusic.text = SignalStrings.Get("btn_import_music");
+
+            var btnSfx = content.Q<Button>("btn-run-import-sfx");
+            if (btnSfx != null) btnSfx.text = SignalStrings.Get("btn_import_sfx");
+
+            var btnRename = content.Q<Button>("btn-run-rename");
+            if (btnRename != null) btnRename.text = SignalStrings.Get("btn_rename_files");
+
             // MUSIC CARD
             ObjectField folderMusic = content.Q<ObjectField>("folder-picker-music");
             folderMusic.objectType = typeof(DefaultAsset);
             TextField prefixMusic = content.Q<TextField>("prefix-input-music");
-            Button btnMusic = content.Q<Button>("btn-run-import-music");
 
             string savedPathMusic = EditorPrefs.GetString("SignalAudio_ImportPath_Music", "");
             if (!string.IsNullOrEmpty(savedPathMusic)) folderMusic.value = AssetDatabase.LoadAssetAtPath<DefaultAsset>(savedPathMusic);
-            prefixMusic.value = EditorPrefs.GetString("SignalAudio_ImportPrefix_Music", "ost_");
+            prefixMusic.value = EditorPrefs.GetString("SignalAudio_ImportPrefix_Music", "mus_");
 
-            btnMusic.clicked += () => RunBatchImport("Music", folderMusic.value as DefaultAsset, prefixMusic.value);
+            if (btnMusic != null) btnMusic.clicked += () => RunBatchImport("Music", folderMusic.value as DefaultAsset, prefixMusic.value);
 
             // SFX CARD
             ObjectField folderSfx = content.Q<ObjectField>("folder-picker-sfx");
             folderSfx.objectType = typeof(DefaultAsset);
             TextField prefixSfx = content.Q<TextField>("prefix-input-sfx");
-            Button btnSfx = content.Q<Button>("btn-run-import-sfx");
 
             string savedPathSfx = EditorPrefs.GetString("SignalAudio_ImportPath_SFX", "");
             if (!string.IsNullOrEmpty(savedPathSfx)) folderSfx.value = AssetDatabase.LoadAssetAtPath<DefaultAsset>(savedPathSfx);
             prefixSfx.value = EditorPrefs.GetString("SignalAudio_ImportPrefix_SFX", "sfx_");
 
-            btnSfx.clicked += () => RunBatchImport("SFX", folderSfx.value as DefaultAsset, prefixSfx.value);
+            if (btnSfx != null) btnSfx.clicked += () => RunBatchImport("SFX", folderSfx.value as DefaultAsset, prefixSfx.value);
             
             // BATCH RENAMER CARD
             ObjectField folderRename = content.Q<ObjectField>("folder-picker-rename");
             folderRename.objectType = typeof(DefaultAsset);
             TextField prefixRename = content.Q<TextField>("prefix-input-rename");
-            Button btnRename = content.Q<Button>("btn-run-rename");
 
             string savedPathRename = EditorPrefs.GetString("SignalAudio_RenamePath", "");
             if (!string.IsNullOrEmpty(savedPathRename)) folderRename.value = AssetDatabase.LoadAssetAtPath<DefaultAsset>(savedPathRename);
             prefixRename.value = EditorPrefs.GetString("SignalAudio_RenamePrefix", "sfx_");
 
-            btnRename.clicked += () => RunBatchRename(folderRename.value as DefaultAsset, prefixRename.value);
+            if (btnRename != null) btnRename.clicked += () => RunBatchRename(folderRename.value as DefaultAsset, prefixRename.value);
 
             _mainContent.Add(content);
         }
@@ -672,7 +775,7 @@ namespace SignalAudioManagerUnity.Editor.UI
             {
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
-                EditorUtility.DisplayDialog("Rename Successful!", $"✓ Successfully renamed {renamedCount} audio files.", "OK");
+                EditorUtility.DisplayDialog("Rename Successful", $"Successfully renamed {renamedCount} audio files.", "OK");
             }
             else
             {
@@ -698,80 +801,24 @@ namespace SignalAudioManagerUnity.Editor.UI
             EditorPrefs.SetString($"SignalAudio_ImportPath_{targetDB}", path);
             EditorPrefs.SetString($"SignalAudio_ImportPrefix_{targetDB}", prefix);
 
-            SoundManagerSO data = _serializedConfig.targetObject as SoundManagerSO;
-            List<AudioEntry> targetList = targetDB == "Music" ? data.musicDatabase : data.sfxDatabase;
+            string propertyName = targetDB == "Music" ? "musicDatabase" : "sfxDatabase";
 
-            string[] audioGuids = AssetDatabase.FindAssets("t:AudioClip", new[] { path });
-
-            int clipsAdded = 0;
-            int clipsUpdated = 0;
-
-            foreach (string guid in audioGuids)
-            {
-                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                string filename = Path.GetFileNameWithoutExtension(assetPath);
-
-                if (filename.StartsWith(prefix))
-                {
-                    AudioClip clip = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
-                    if (clip == null) continue;
-
-                    string audioID = filename.Substring(prefix.Length);
-
-                    AudioEntry existingEntry = targetList.Find(entry => entry.audioID == audioID);
-                    if (existingEntry != null)
-                    {
-                        if (!existingEntry.audioClips.Contains(clip))
-                        {
-                            existingEntry.audioClips.Add(clip);
-                            clipsUpdated++;
-                        }
-                    }
-                    else
-                    {
-                        AudioEntry newEntry = new AudioEntry { audioID = audioID };
-                        newEntry.audioClips.Add(clip);
-                        targetList.Add(newEntry);
-                        clipsAdded++;
-                    }
-                }
-            }
-
-            if (clipsAdded > 0 || clipsUpdated > 0)
-            {
-                EditorUtility.SetDirty(data);
-                _serializedConfig.Update();
-                EditorUtility.DisplayDialog("Import Successful!", $"✓ Added {clipsAdded} new entries\n✓ Updated {clipsUpdated} existing entries", "OK");
-            }
-            else
-            {
-                EditorUtility.DisplayDialog("No New Clips Found", $"No new audio clips starting with '{prefix}' were found in the selected folder.", "OK");
-            }
-        }
-
-        private void ImportAudioClips(string folderPath, string prefix, string targetProperty)
-        {
-            if (string.IsNullOrEmpty(folderPath) || string.IsNullOrEmpty(prefix)) return;
-
-            string[] guids = AssetDatabase.FindAssets("t:AudioClip", new[] { folderPath });
-            
+            string[] guids = AssetDatabase.FindAssets("t:AudioClip", new[] { path });
             _serializedConfig.Update();
             SoundManagerSO data = _serializedConfig.targetObject as SoundManagerSO;
             
-            var targetList = targetProperty == "musicDatabase" ? data.musicDatabase : data.sfxDatabase;
-            
+            var targetList = propertyName == "musicDatabase" ? data.musicDatabase : data.sfxDatabase;
             int clipsAdded = 0;
             int clipsUpdated = 0;
 
             foreach (string guid in guids)
             {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                AudioClip clip = AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                AudioClip clip = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
                 
                 if (clip != null)
                 {
-                    string filename = System.IO.Path.GetFileNameWithoutExtension(path);
-                    
+                    string filename = Path.GetFileNameWithoutExtension(assetPath);
                     if (!filename.StartsWith(prefix)) continue;
 
                     string audioID = filename.Substring(prefix.Length);
@@ -799,7 +846,7 @@ namespace SignalAudioManagerUnity.Editor.UI
             {
                 EditorUtility.SetDirty(data);
                 _serializedConfig.Update();
-                EditorUtility.DisplayDialog("Import Successful!", $"✓ Added {clipsAdded} new entries\n✓ Updated {clipsUpdated} existing entries", "OK");
+                EditorUtility.DisplayDialog("Import Successful", $"Added {clipsAdded} new entries\nUpdated {clipsUpdated} existing entries", "OK");
             }
             else
             {
@@ -807,7 +854,7 @@ namespace SignalAudioManagerUnity.Editor.UI
             }
         }
 
-        private void BindListView(ListView listView, string propertyName, Dictionary<int, bool> foldoutStates = null, System.Action<int> onDelete = null)
+        private void BindListView(ListView listView, string propertyName, Dictionary<int, bool> foldoutStates = null, Action<int> onDelete = null)
         {
             SerializedProperty listProperty = _serializedConfig.FindProperty(propertyName);
             
@@ -866,7 +913,6 @@ namespace SignalAudioManagerUnity.Editor.UI
 
             listView.bindItem = (element, pageIndex) =>
             {
-                // Our itemsSource is a List<int> containing the real indices
                 if (pageIndex < 0 || pageIndex >= listView.itemsSource.Count) return;
                 
                 int realIndex = (int)listView.itemsSource[pageIndex];
@@ -877,13 +923,6 @@ namespace SignalAudioManagerUnity.Editor.UI
 
                 var idField = element.Q<TextField>("audio-id-field");
                 idField?.BindProperty(itemProperty.FindPropertyRelative("audioID"));
-
-                // Force white text
-                if (idField != null)
-                {
-                    var textInput = idField.Q<VisualElement>(className: "unity-base-text-field__input");
-                    if (textInput != null) textInput.style.color = Color.white;
-                }
 
                 var clipsField = element.Q<PropertyField>("audio-clips-field");
                 clipsField?.BindProperty(itemProperty.FindPropertyRelative("audioClips"));
@@ -920,7 +959,6 @@ namespace SignalAudioManagerUnity.Editor.UI
                 var deleteBtn = element.Q<Button>("btn-delete");
                 if (deleteBtn != null) deleteBtn.userData = realIndex;
 
-                // Restore foldout state
                 var foldout = element.Q<Foldout>();
                 if (foldout != null)
                 {
@@ -951,7 +989,8 @@ namespace SignalAudioManagerUnity.Editor.UI
                     errorContainer.style.paddingBottom = 6;
                     errorContainer.style.paddingLeft = 10;
                     errorContainer.style.paddingRight = 10;
-                    errorContainer.style.marginTop = 10;
+                    errorContainer.style.marginTop = 8;
+                    errorContainer.style.borderRadius = 4;
                     errorContainer.style.borderLeftWidth = 3;
                     errorContainer.style.borderLeftColor = new Color(1f, 0.3f, 0.3f);
                     errorContainer.style.display = DisplayStyle.None;
@@ -965,7 +1004,7 @@ namespace SignalAudioManagerUnity.Editor.UI
 
                     errorLabel = new Label { name = "error-label" };
                     errorLabel.style.color = new Color(1f, 0.7f, 0.7f);
-                    errorLabel.style.fontSize = 12;
+                    errorLabel.style.fontSize = 11;
                     errorLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
 
                     errorContainer.Add(icon);
@@ -983,7 +1022,6 @@ namespace SignalAudioManagerUnity.Editor.UI
                     try
                     {
                         if (itemProperty == null || itemProperty.serializedObject == null) return;
-                        
                         if (realIndex >= listProperty.arraySize) return;
 
                         itemProperty.serializedObject.Update();
@@ -999,8 +1037,7 @@ namespace SignalAudioManagerUnity.Editor.UI
                         {
                             for (int i = 0; i < clipsProp.arraySize; i++)
                             {
-                                var elementProp = clipsProp.GetArrayElementAtIndex(i);
-                                if (elementProp != null && elementProp.objectReferenceValue != null)
+                                if (clipsProp.GetArrayElementAtIndex(i).objectReferenceValue != null)
                                 {
                                     hasValidClip = true;
                                     break;
@@ -1008,45 +1045,44 @@ namespace SignalAudioManagerUnity.Editor.UI
                             }
                         }
 
-                        if (string.IsNullOrEmpty(id) || !hasValidClip)
+                        int occurrences = 0;
+                        if (!string.IsNullOrWhiteSpace(id))
+                        {
+                            for (int i = 0; i < listProperty.arraySize; i++)
+                            {
+                                var otherProp = listProperty.GetArrayElementAtIndex(i);
+                                var otherIdProp = otherProp.FindPropertyRelative("audioID");
+                                if (otherIdProp != null && otherIdProp.stringValue == id)
+                                {
+                                    occurrences++;
+                                }
+                            }
+                        }
+
+                        if (string.IsNullOrWhiteSpace(id))
                         {
                             errorContainer.style.display = DisplayStyle.Flex;
-                            
-                            if (errorLabel != null)
-                            {
-                                errorLabel.text = string.IsNullOrEmpty(id) 
-                                    ? "Critical: Audio ID cannot be empty!" 
-                                    : "Critical: No valid AudioClips assigned to this ID!";
-                            }
-                            
-                            if (idField != null)
-                            {
-                                var textInput = idField.Q<VisualElement>(className: "unity-base-text-field__input");
-                                if (textInput != null) textInput.style.color = new Color(1f, 0.4f, 0.4f);
-                            }
+                            errorLabel.text = SignalStrings.Get("error_empty_id");
+                        }
+                        else if (!hasValidClip)
+                        {
+                            errorContainer.style.display = DisplayStyle.Flex;
+                            errorLabel.text = SignalStrings.Get("error_no_clips");
+                        }
+                        else if (occurrences > 1)
+                        {
+                            errorContainer.style.display = DisplayStyle.Flex;
+                            errorLabel.text = SignalStrings.Get("error_duplicate_id", id);
                         }
                         else
                         {
                             errorContainer.style.display = DisplayStyle.None;
-                            
-                            if (idField != null)
-                            {
-                                var textInput = idField.Q<VisualElement>(className: "unity-base-text-field__input");
-                                if (textInput != null) textInput.style.color = Color.white;
-                            }
                         }
                     }
-                    catch (System.Exception)
+                    catch
                     {
-
+                        // Safe ignore in teardown
                     }
-                }
-
-                ValidateEntry();
-
-                if (element.userData is IVisualElementScheduledItem oldSchedule)
-                {
-                    oldSchedule.Pause();
                 }
 
                 IVisualElementScheduledItem scheduledValidation = element.schedule.Execute(ValidateEntry).Every(250);
@@ -1060,7 +1096,7 @@ namespace SignalAudioManagerUnity.Editor.UI
             };
         }
 
-private void PlayPreview(AudioEntry entry)
+        private void PlayPreview(AudioEntry entry)
         {
             if (_previewSource == null || entry == null) return;
             _previewSource.Stop();
@@ -1071,11 +1107,12 @@ private void PlayPreview(AudioEntry entry)
             _previewSource.clip = clip;
             _previewSource.pitch = entry.GetRandomPitch();
             _previewSource.volume = entry.GetRandomVolume();
+            _previewSource.spatialBlend = entry.spatialBlend;
             
             _previewSource.Play();
         }
 
-       private void RunInitialSetup(string selectedPath)
+        private void RunInitialSetup(string selectedPath)
         {
             string targetBaseFolder = !string.IsNullOrEmpty(selectedPath) ? selectedPath : "Assets/Resenha Studio";
             string targetFolder = $"{targetBaseFolder}/SignalAudio_Setup";
@@ -1141,10 +1178,6 @@ private void PlayPreview(AudioEntry entry)
                     PrefabUtility.SavePrefabAsset(managerPrefab);
                 }
             }
-            else
-            {
-                EditorUtility.DisplayDialog("Setup Warning", "Audio_Managers prefab could not be loaded for configuration. Please check the Resources folder.", "OK");
-            }
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -1158,5 +1191,13 @@ private void PlayPreview(AudioEntry entry)
             string[] guids = AssetDatabase.FindAssets($"{fileName} {filter}");
             return guids.Length > 0 ? guids[0] : null;
         }
+    }
+}
+
+namespace SignalAudioManagerUnity.Editor.UI
+{
+    [Obsolete("SignalAudioManagerUnity.Editor.UI.SignalAudioDashboard is deprecated. Please use Resenha.Signal.Editor.UI.SignalAudioDashboard instead.")]
+    public class SignalAudioDashboard : Resenha.Signal.Editor.UI.SignalAudioDashboard
+    {
     }
 }

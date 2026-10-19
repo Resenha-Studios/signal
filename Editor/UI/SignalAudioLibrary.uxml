@@ -3,13 +3,13 @@
     <ui:VisualElement class="library-container">
         <ui:Label name="library-title" text="Audio Library" class="section-header" />
 
-        <!-- Toolbar: search + collapse/expand buttons -->
+        <!-- Toolbar: search + collapse/expand/delete actions -->
         <ui:VisualElement class="library-toolbar">
-            <uie:ToolbarSearchField name="audio-search-field" class="library-search" />
+            <uie:ToolbarSearchField name="audio-search-field" class="library-search" tooltip="Search audio entries by ID" />
             <ui:VisualElement class="library-toolbar-actions">
-                <ui:Button name="btn-collapse-all" text="⊟ COLLAPSE" class="toolbar-action-btn" />
-                <ui:Button name="btn-expand-all"   text="⊞ EXPAND" class="toolbar-action-btn" />
-                <ui:Button name="btn-delete-all"   text="✖ DELETE ALL" class="toolbar-action-btn delete-all-btn" />
+                <ui:Button name="btn-collapse-all" text="Collapse" class="toolbar-action-btn" tooltip="Collapse all entry foldouts" />
+                <ui:Button name="btn-expand-all"   text="Expand" class="toolbar-action-btn" tooltip="Expand all entry foldouts" />
+                <ui:Button name="btn-delete-all"   text="Clear All" class="toolbar-action-btn delete-all-btn" tooltip="Delete all audio entries in this database" />
             </ui:VisualElement>
         </ui:VisualElement>
 
@@ -18,14 +18,14 @@
         <!-- Pagination Footer -->
         <ui:VisualElement class="pagination-footer">
             <ui:VisualElement class="pagination-footer-left">
-                <ui:Button name="btn-add-item" text="+" class="pagination-btn pagination-btn-add" />
-                <ui:Button name="btn-remove-item" text="-" class="pagination-btn pagination-btn-remove" />
+                <ui:Button name="btn-add-item" text="+" class="pagination-btn pagination-btn-add" tooltip="Add new audio entry" />
+                <ui:Button name="btn-remove-item" text="-" class="pagination-btn pagination-btn-remove" tooltip="Remove last audio entry" />
             </ui:VisualElement>
             
             <ui:VisualElement class="pagination-footer-right">
-                <ui:Button name="btn-prev-page" text="&lt;" class="pagination-btn" />
+                <ui:Button name="btn-prev-page" text="&lt;" class="pagination-btn" tooltip="Previous page" />
                 <ui:Label name="lbl-page-info" text="Page 1 of 1" class="pagination-label" />
-                <ui:Button name="btn-next-page" text="&gt;" class="pagination-btn" />
+                <ui:Button name="btn-next-page" text="&gt;" class="pagination-btn" tooltip="Next page" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

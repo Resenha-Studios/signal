@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SignalAudioManagerUnity.Data
+namespace Resenha.Signal.Data
 {
-
     [System.Serializable]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "SignalAudioManagerUnity.Data", "SignalAudioManagerUnity")]
     public class AmbientSoundConfig
     {
         [Tooltip("The ambient type this configuration represents.")]

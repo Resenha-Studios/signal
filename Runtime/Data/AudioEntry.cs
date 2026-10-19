@@ -8,9 +8,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace SignalAudioManagerUnity.Data
+namespace Resenha.Signal.Data
 {
     [Serializable]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "SignalAudioManagerUnity.Data", "SignalAudioManagerUnity")]
     public class AudioEntry
     {
         [Tooltip("The unique identifier used to call this audio event via code or signals.")]

@@ -5,10 +5,11 @@
  * and global mixer volume controls.
  * ==============================================================================*/
 
-using SignalAudioManagerUnity.Core;
+using Resenha.Signal.Core;
+using Resenha.Signal.Communication;
 using UnityEngine;
 
-namespace SignalAudioManagerUnity.Communication
+namespace Resenha.Signal
 {
     /// <summary>
     /// Global entry point for the Signal Audio Manager. 
@@ -285,5 +286,62 @@ namespace SignalAudioManagerUnity.Communication
         public static void SetUIVolume(float normalizedVolume) => AudioEventChannel.RaiseSetGroupVolume(AudioCategory.UI, normalizedVolume);
         
         #endregion
+    }
+}
+
+namespace Resenha.Signal.Communication
+{
+    /// <summary>
+    /// Alias to Resenha.Signal.Signal for backwards compatibility with communication namespace.
+    /// </summary>
+    public static class Signal
+    {
+        public static long PlaySFX(string audioID, float volumeMultiplier = 1f, float pitchMultiplier = 1f, bool triggerDucking = false, float duckingDuration = 1f)
+            => Resenha.Signal.Signal.PlaySFX(audioID, volumeMultiplier, pitchMultiplier, triggerDucking, duckingDuration);
+
+        public static long PlaySFX(string audioID, Vector3 position, float volumeMultiplier = 1f, float pitchMultiplier = 1f, bool triggerDucking = false, float duckingDuration = 1f)
+            => Resenha.Signal.Signal.PlaySFX(audioID, position, volumeMultiplier, pitchMultiplier, triggerDucking, duckingDuration);
+
+        public static long PlaySFX(string audioID, Transform targetTransform, float volumeMultiplier = 1f, float pitchMultiplier = 1f, bool triggerDucking = false, float duckingDuration = 1f)
+            => Resenha.Signal.Signal.PlaySFX(audioID, targetTransform, volumeMultiplier, pitchMultiplier, triggerDucking, duckingDuration);
+
+        public static long PlayDelayedSFX(string audioID, float delayInSeconds, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
+            => Resenha.Signal.Signal.PlayDelayedSFX(audioID, delayInSeconds, volumeMultiplier, pitchMultiplier);
+
+        public static long PlayUI(string audioID, float volumeMultiplier = 1f, float pitchMultiplier = 1f)
+            => Resenha.Signal.Signal.PlayUI(audioID, volumeMultiplier, pitchMultiplier);
+
+        public static void PlayMusic(string audioID, float fadeDuration = 1f)
+            => Resenha.Signal.Signal.PlayMusic(audioID, fadeDuration);
+
+        public static void StopMusic(float fadeDuration = 1f)
+            => Resenha.Signal.Signal.StopMusic(fadeDuration);
+
+        public static void PauseMusic()
+            => Resenha.Signal.Signal.PauseMusic();
+
+        public static void ResumeMusic()
+            => Resenha.Signal.Signal.ResumeMusic();
+
+        public static void StopInstance(long instanceId)
+            => Resenha.Signal.Signal.StopInstance(instanceId);
+
+        public static void PauseInstance(long instanceId)
+            => Resenha.Signal.Signal.PauseInstance(instanceId);
+
+        public static void ResumeInstance(long instanceId)
+            => Resenha.Signal.Signal.ResumeInstance(instanceId);
+
+        public static void SetMasterVolume(float normalizedVolume)
+            => Resenha.Signal.Signal.SetMasterVolume(normalizedVolume);
+
+        public static void SetMusicVolume(float normalizedVolume)
+            => Resenha.Signal.Signal.SetMusicVolume(normalizedVolume);
+
+        public static void SetSFXVolume(float normalizedVolume)
+            => Resenha.Signal.Signal.SetSFXVolume(normalizedVolume);
+
+        public static void SetUIVolume(float normalizedVolume)
+            => Resenha.Signal.Signal.SetUIVolume(normalizedVolume);
     }
 }

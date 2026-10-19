@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace SignalAudioManagerUnity.Data
+namespace Resenha.Signal.Data
 {
-    [CreateAssetMenu(fileName = "SoundManagerSO", menuName = "ResenhaTools/Signal/Configuration")]
+    [CreateAssetMenu(fileName = "SoundManagerSO", menuName = "Resenha/Signal/Configuration")]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "SignalAudioManagerUnity.Data", "SignalAudioManagerUnity")]
     public class SoundManagerSO : ScriptableObject
     {
         [Header("Audio Mixer Configuration")]

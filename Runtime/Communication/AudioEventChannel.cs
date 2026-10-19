@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace SignalAudioManagerUnity.Communication
+namespace Resenha.Signal.Communication
 {
     public static class AudioEventChannel
     {

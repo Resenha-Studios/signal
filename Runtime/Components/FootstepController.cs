@@ -16,12 +16,13 @@
  * Assign a SurfaceSoundMapSO in the Inspector to map surfaces to Audio IDs.
  * ==============================================================================*/
 
-using SignalAudioManagerUnity.Communication;
-using SignalAudioManagerUnity.Data;
+using Resenha.Signal.Communication;
+using Resenha.Signal.Data;
 using UnityEngine;
 
-namespace SignalAudioManagerUnity.Components
+namespace Resenha.Signal.Components
 {
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "SignalAudioManagerUnity.Components", "SignalAudioManagerUnity")]
     public class FootstepController : MonoBehaviour
     {
         // ==========================================

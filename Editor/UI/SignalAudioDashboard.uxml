@@ -1,59 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     
-    <!-- ── Welcome / Setup Screen ── -->
-    <ui:VisualElement name="welcome-screen" class="welcome-screen" style="align-items: center; justify-content: center; height: 100%; width: 100%;">
-        <ui:VisualElement class="section-container" style="width: 85%; max-width: 580px; align-items: center; padding: 48px 32px;">
+    <!-- Top Header Bar (Guardian Standard) -->
+    <ui:VisualElement name="signal-header" class="signal-header">
+        <ui:VisualElement class="signal-brand">
+            <ui:VisualElement style="flex-direction: row; align-items: center;">
+                <ui:Label text="Signal" name="header-title" class="signal-title" />
+                <ui:Label text="v2.0" class="signal-version-badge" />
+            </ui:VisualElement>
+            <ui:Label text="Audio Architecture &amp; Sound Manager" name="header-subtitle" class="signal-subtitle" />
+        </ui:VisualElement>
         
-            <ui:Label text="◈" style="font-size: 40px; margin-bottom: 18px; color: #9d72f5;" />
-        
-            <ui:Label text="Signal Audio Manager" class="welcome-title" style="font-size: 22px; color: #9d72f5; letter-spacing: 1px;" />
-            <ui:Label text="No audio configuration found in this project." class="welcome-subtitle" style="margin-bottom: 28px;" />
-        
-            <ui:Label text="Click the button below to automatically generate the necessary folders, audio mixers, prefabs, and configuration files." class="welcome-desc" style="margin-bottom: 10px;" />
-            <ui:Label text="You will be prompted to choose the destination folder." class="welcome-desc" style="margin-bottom: 36px; color: #4ec9b0;" />
-        
-            <ui:Button name="btn-initial-setup" text="INITIAL SETUP" class="setup-btn" style="padding: 12px 32px; font-size: 13px; letter-spacing: 1px;" />
-        
+        <ui:VisualElement class="signal-header-actions">
+            <ui:DropdownField name="language-dropdown" class="signal-lang-dropdown" tooltip="Change dashboard language" />
+            <ui:Button name="btn-header-setup" text="+ Setup" class="signal-btn-secondary" tooltip="Run or recreate initial audio setup" />
         </ui:VisualElement>
     </ui:VisualElement>
 
-    <!-- ── Main Dashboard ── -->
-    <ui:VisualElement name="dashboard-container" class="dashboard-container">
-        <ui:VisualElement name="sidebar" class="sidebar">
-            
-            <ui:Label text="SIGNAL" class="sidebar-title" />
+    <!-- Welcome / Setup Screen (shown when config is missing) -->
+    <ui:VisualElement name="welcome-screen" class="welcome-screen">
+        <ui:VisualElement class="welcome-card">
+            <ui:VisualElement class="welcome-icon-box">
+                <ui:Label text="♪" class="welcome-glyph" />
+            </ui:VisualElement>
+            <ui:Label text="Signal Audio Architecture" name="welcome-title" class="welcome-title" />
+            <ui:Label text="No audio configuration found in this project." name="welcome-subtitle" class="welcome-subtitle" />
+            <ui:Label text="Click below to initialize folders, audio mixers, prefabs, and configuration assets automatically." name="welcome-desc" class="welcome-desc" />
+            <ui:Button name="btn-initial-setup" text="Initialize Signal" class="signal-btn-primary" />
+        </ui:VisualElement>
+    </ui:VisualElement>
 
+    <!-- Main Dashboard Container -->
+    <ui:VisualElement name="dashboard-container" class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <ui:VisualElement name="sidebar" class="sidebar">
             <ui:Button name="tab-global" class="sidebar-btn sidebar-btn-active">
                 <ui:VisualElement name="icon-global" class="sidebar-icon" />
-                <ui:Label text="Global Settings" />
+                <ui:Label text="Settings" name="lbl-tab-global" />
             </ui:Button>
             
             <ui:Button name="tab-music" class="sidebar-btn">
                 <ui:VisualElement name="icon-music" class="sidebar-icon" />
-                <ui:Label text="Music Library" />
+                <ui:Label text="Music" name="lbl-tab-music" />
             </ui:Button>
             
             <ui:Button name="tab-sfx" class="sidebar-btn">
                 <ui:VisualElement name="icon-sfx" class="sidebar-icon" />
-                <ui:Label text="SFX Library" />
+                <ui:Label text="SFX &amp; UI" name="lbl-tab-sfx" />
             </ui:Button>
             
             <ui:Button name="tab-tools" class="sidebar-btn">
                 <ui:VisualElement name="icon-tools" class="sidebar-icon" />
-                <ui:Label text="Import Tools" />
+                <ui:Label text="Import Tools" name="lbl-tab-tools" />
             </ui:Button>
 
             <ui:VisualElement style="flex-grow: 1;" />
 
-            <ui:Button name="tab-help" class="sidebar-btn">
+            <ui:Button name="tab-help" class="sidebar-btn sidebar-btn-help">
                 <ui:VisualElement name="icon-help" class="sidebar-icon" />
-                <ui:Label text="Help &amp; Docs" />
+                <ui:Label text="Docs" name="lbl-tab-help" />
             </ui:Button>
         </ui:VisualElement>
 
+        <!-- Dynamic Content Area -->
         <ui:VisualElement name="main-content" class="main-content">
-            <ui:Label text="Loading..." class="help-text" />
+            <ui:Label text="Loading..." class="signal-loading-text" />
         </ui:VisualElement>
     </ui:VisualElement>
+
 </ui:UXML>

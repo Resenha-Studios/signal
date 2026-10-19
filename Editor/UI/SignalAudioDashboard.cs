@@ -35,8 +35,7 @@ namespace Resenha.Signal.Editor.UI
         private AudioSource _previewSource;
         private GameObject _previewObject;
 
-        [MenuItem("Tools/Resenha/Signal %s", priority = 101)]
-        [MenuItem("ResenhaTools/Signal/Dashboard", priority = 999)]
+        [MenuItem("Tools/Resenha/Signal %#s", priority = 101)]
         public static void ShowWindow()
         {
             SignalAudioDashboard wnd = GetWindow<SignalAudioDashboard>();

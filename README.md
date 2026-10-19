@@ -1,8 +1,7 @@
 <p align="center">
   <h1 align="center">🎵 Signal</h1>
   <p align="center">
-    <strong>Manage and play audio in Unity effortlessly — Zero setup, high performance, and modern UI Toolkit!</strong><br>
-    <em>Gerencie e toque áudios, músicas e efeitos sonoros na Unity de forma facilitada!</em>
+    <strong>Manage and play audio in Unity effortlessly: zero setup, high performance, and modern UI Toolkit!</strong>
   </p>
   <p align="center">
     <a href="https://github.com/Resenha-Studios/signal/blob/main/LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT"></a>
@@ -15,7 +14,7 @@
 
 ---
 
-## ⚡ What is Signal? / O que é o Signal?
+## ⚡ What is Signal?
 
 > ### 🎯 In a Nutshell
 > **Signal is an open-source tool to manage, organize, and play audio in Unity effortlessly!**
@@ -29,10 +28,6 @@
 > - 🎛️ **Modern UI Toolkit Dashboard**: Manage SFX, Music, and UI sounds from **`Tools > Resenha > Signal`** with instant search, pagination, and real-time audio preview.
 > - 🔊 **Surface-Aware Footsteps & 3D Audio**: Raycast-based footstep engine detecting terrain and physics materials, plus 3D falloff and smart ducking.
 > - 🛡️ **Typo-Proof Autocomplete**: Auto-generates type-safe constants (`AudioKeys.SFX.jump`).
->
-> ---
->
-> *🇧🇷 **Em poucas palavras:** O Signal é uma ferramenta para **gerenciar e tocar áudios na Unity de forma facilitada!** Em vez de configurar AudioSources manuais e managers em cada cena, basta chamar `Signal.PlaySFX("jump")` em qualquer script. Ele cuida do pooling, mixagem, crossfade de músicas e oferece um dashboard moderno em UI Toolkit para organizar todos os seus sons com facilidade.*
 
 ---
 
